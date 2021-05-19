@@ -29,9 +29,10 @@ var userSchema = mongoose.Schema({
         age: String
     },
     job_type:{
-        job_type: String,
-        enum: ["IT", "Self_Bussiness", "Student", "Teacher", "Other"],
-        required: false
+        type: String,
+        enum: ["IT", "self_bussiness", "student", "teacher", "other", "unemployed", "null"],
+        default: "unemployed",
+        required: true
     },
     phone: {
         type: String,

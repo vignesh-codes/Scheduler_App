@@ -53,7 +53,7 @@ router.route('/user/addLimited/:user_id')
 
 //EDIT LIMITED APPS ALONE FOR USER    
 router.route('/user/editLimited/:user_id')
-    .put(userController.limitedApTime)
+    .put(userController.limitedAppTime)
 
 
 

@@ -5,6 +5,7 @@ let bodyParser = require('body-parser');
 //import mongoose
 let mongoose = require('mongoose');
 var cors = require('cors')
+var morgan = require('morgan')
 
 const config = require ('./configs/db.config');
 
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json())
 
+app.use(morgan('combined'))
 
 // Welcome message
 app.get('/', (req, res) => res.send('Welcome to Express'));

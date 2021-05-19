@@ -1,5 +1,8 @@
 //userController.js
 //Import User Model
+const e = require('express');
+var validator = require('validator');
+
 User = require('../models/userModel');
 //For index
 exports.index = function (req, res) {
@@ -21,11 +24,26 @@ exports.index = function (req, res) {
 
 //For creating new user
 exports.add = function (req, res) {
-    var user = new User();
-    user.name = req.body.name? req.body.name: user.name;
-    user.email = req.body.email;
-    user.phone = req.body.phone;
-    user.location = req.body.location;
+    if (!validator.isEmail(req.body.email)){
+        res.status(400).json({
+            status: 400,
+            message: "Error, Enter a valid email address"
+        })
+    }
+    else if(!validator.isMobilePhone(req.body.phone)){
+        res.status(400).json({
+            status: 400,
+            message: "Error, Enter a Valid Phone Number"
+        })
+    }
+    else{
+        var user = new User();
+        user.name = req.body.name? req.body.name: user.name;
+        user.email = req.body.email;
+        user.phone = req.body.phone;
+        user.location = req.body.location;
+        user.job_type = req.body.job_type;
+    }
 //Save and check error
     user.save()
     
@@ -42,13 +60,20 @@ exports.add = function (req, res) {
 }
 
 
+//Add Work Schedule for a User
 exports.addWork = function (req, res){
     User.findById(req.params.user_id, function(err, user){
         console.log(req.body)
-        if (err)
-            res.send(err)
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
+        
+        // Check if the vaild body exist
+        else{
         day = req.body.day
-
         if (req.body.work_start_hours && req.body.work_end_hours){
 
             for (i in day){
@@ -95,6 +120,7 @@ exports.addWork = function (req, res){
             
             
 }
+    // Check if the valid body exist
     if (req.body.break_time_start && req.body.break_time_end){
 
         for (i in day){
@@ -139,29 +165,33 @@ exports.addWork = function (req, res){
         }
         
     }
-user.save()
-    .then(user => res.status(200).json({
-        status: 200,
-        message: "Work Hours Updated",
-        data: user
-    }))
-    .catch(err=> res.status(500).json({
-        status: 500,
-        message: "Error Updating Work Hours",
-        err_msg: err.message
-}))
-
+        // Save the updated objects
+        user.save()
+            .then(user => res.status(200).json({
+                status: 200,
+                message: "Work Hours Updated",
+                data: user
+            }))
+            .catch(err=> res.status(500).json({
+                status: 500,
+                message: "Error Updating Work Hours",
+                err_msg: err.message
+        }))
+        }
     }) 
     
 }
 
-//limited_sites: [{site: String, time_limit: String}],
-
+// Add Limited Hours alone for certain App
 exports.addLimited = function (req, res) {
     User.findById(req.params.user_id, function(err, user){
-        if (err)
-            res.send(err)
-        
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
+        else{
         day = req.body.day
         var time_limit_dict = {
             site: req.body.site, weekday_time_limit: req.body.weekday_time_limit, weekend_time_limit: req.body.weekend_time_limit
@@ -200,17 +230,19 @@ exports.addLimited = function (req, res) {
                 user.schedules.sunday.limited_sites.push(time_limit_dict)      
         }
     }
-    user.save()
-        .then(user => res.status(200).json({
-            status: 200,
-            message: "Limited Hours for Blocked Apps Updated",
-            data: user
+        user.save()
+            .then(user => res.status(200).json({
+                status: 200,
+                message: "Limited Hours for Blocked Apps Updated",
+                data: user
+            }))
+            .catch(err=> res.status(500).json({
+                status: 500,
+                message: "Error Updating Limited Hours",
+                err_msg: err.message
         }))
-        .catch(err=> res.status(500).json({
-            status: 500,
-            message: "Error Updating Limited Hours",
-            err_msg: err.message
-    }))
+    }
+    
         
             console.log(day[i]) 
         
@@ -218,15 +250,19 @@ exports.addLimited = function (req, res) {
 }
 
 
-
+// Add Apps to be blocked for a user
 exports.addApp = function(req, res) {
     User.findById(req.params.user_id, function (err, user){
         var time_limit_dict = {
             site: req.body.site, weekday_time_limit: "1 hr", weekend_time_limit: "2 hr"
         }
-        if (err)
-            res.send(err);
-        
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
+        else{
         bsites = req.body.site
 
         for (i in req.body.day){
@@ -293,19 +329,25 @@ exports.addApp = function(req, res) {
             err_msg: err.message
     }))
         
-    })
+    }})
+    
 }
 
-
+// Remove an app from the blocked list and limited apps list
 exports.removeApp = function(req, res) {
     User.findById(req.params.user_id, function (err, user){
-        if (err)
-            res.send(err);
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
         
+        
+        
+        else{
         get_sites = req.body.site
         console.log(get_sites)
-        
-    
         for (i in req.body.day) {
             console.log("num", req.body.day[i], req.body.id[i])
             if (req.body.day[i] === "monday"){
@@ -321,8 +363,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.monday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.monday.limited_sites.pull({_id: req.body.id[i]})
             }
             else if (req.body.day[i] === "tuesday"){
@@ -338,8 +381,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.tuesday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.tuesday.limited_sites.pull({_id: req.body.id[i]})
             }
             else if (req.body.day[i] === "wednesday"){
@@ -355,8 +399,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.wednesday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.wednesday.limited_sites.pull({_id: req.body.id[i]})
             }
             else if (req.body.day[i] === "thursday"){
@@ -372,8 +417,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.thursday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.thursday.limited_sites.pull({_id: req.body.id[i]})
             }
             else if (req.body.day[i] === "friday"){
@@ -389,8 +435,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.friday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.friday.limited_sites.pull({_id: req.body.id[i]})
             }
             else if (req.body.day[i] === "saturday"){
@@ -406,8 +453,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.saturday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.saturday.limited_sites.pull({_id: req.body.id[i]})
             }
             else if (req.body.day[i] === "sunday"){
@@ -423,8 +471,9 @@ exports.removeApp = function(req, res) {
                     }
                 }
                 updatedAppList = current.filter((value)=>value!=current[i])
-                console.log(updatedAppList)
+                
                 user.schedules.sunday.blocked_sites = updatedAppList
+                console.log(updatedAppList)
                 user.schedules.sunday.limited_sites.pull({_id: req.body.id[i]})
             }
         }
@@ -439,15 +488,26 @@ exports.removeApp = function(req, res) {
             message: "Error Updating Blocked Apps List",
             err_msg: err.message
     }))
+    }
+
+        console.log("Removing App")
+        
         
     })
 }
 
 
-exports.limitedApTime = function(req, res) {
+// Edit the limited hours for the blocked apps to be used during free time
+exports.limitedAppTime = function(req, res) {
     
     User.findById(req.params.user_id, function(err, user) {
-        
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
+        else{
         for (i in req.body.day) {
             if (req.body.day[i] === "monday"){
                 for (i in user.schedules.monday.limited_sites){
@@ -529,11 +589,8 @@ exports.limitedApTime = function(req, res) {
                     }
                 }
             }
-        }
+        }}
         user.save()
-    })  
-    
-
         .then(user => res.status(200).json({
             status: 200,
             message: "Successfully Updated the Limited Apps Time",
@@ -544,6 +601,10 @@ exports.limitedApTime = function(req, res) {
             message: "Error Updating the Limited Apps Time",
             err_msg: err.message
     }))
+    })  
+    
+
+        
 }
 
 
@@ -568,25 +629,43 @@ exports.view = function (req, res) {
 
 // Update User
 exports.update = function (req, res) {
-    User.findById(req.params.user_id, function (err, user) {
-        if (err)
-            res.send(err);
-        user.name = req.body.name ? req.body.name : user.name;
-        user.email = req.body.email;
-        user.phone = req.body.phone;
-        user.location = req.body.location;
-        
-//save and check errors
-        user.save(function (err) {
-            if (err)
-                res.json(err)
-            res.json({
-                status: 200,
-                message: "User Updated Successfully",
-                data: user
+    if (!validator.isEmail(req.body.email)){
+        res.status(400).json({
+            status: 400,
+            message: "Error, Enter a valid email address"
+        })
+    }
+    else if(!validator.isMobilePhone(req.body.phone)){
+        res.status(400).json({
+            status: 400,
+            message: "Error, Enter a Valid Phone Number"
+        })
+    }
+    else{
+        User.findById(req.params.user_id, function (err, user) {
+            if (err){
+                res.status(500).json({
+                    status: 500,
+                    message: "User Not Found",
+                    data: err
+            })}
+            user.name = req.body.name ? req.body.name : user.name;
+            user.email = req.body.email;
+            user.phone = req.body.phone;
+            user.location = req.body.location;
+            user.job_type = req.body.job_type;
+            
+    //save and check errors
+            user.save(function (err) {
+                if (err)
+                    res.json(err)
+                res.json({
+                    status: 200,
+                    message: "User Updated Successfully",
+                    data: user
+                });
             });
-        });
-    });
+        })}
 };
 
 
@@ -595,8 +674,12 @@ exports.delete = function (req, res) {
     User.deleteOne({
         _id: req.params.user_id
     }, function (err, contact) {
-        if (err)
-            res.send(err)
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
         res.json({
             status: 200,
             message: 'User Deleted'
@@ -605,10 +688,15 @@ exports.delete = function (req, res) {
 }
 
 
-exports.updateDelete = function (req, res) {
+exports.deleteLimited = function (req, res) {
     User.findById(req.params.user_id, function (err, user) {
-        if (err)
-            res.send(err);
+        if (err){
+            res.status(500).json({
+                status: 500,
+                message: "User Not Found",
+                data: err
+        })}
+        else{
         day = req.body.day
 
         if (day === "monday") {
@@ -643,6 +731,7 @@ exports.updateDelete = function (req, res) {
                 data: user
             });
         });
+        }
     });
 };
 
