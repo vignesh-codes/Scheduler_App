@@ -65,7 +65,7 @@ exports.addWork = function (req, res){
     User.findById(req.params.user_id, function(err, user){
         console.log(req.body)
         if (err){
-            res.status(500).json({
+            return res.status(500).json({
                 status: 500,
                 message: "User Not Found",
                 data: err
@@ -73,47 +73,47 @@ exports.addWork = function (req, res){
         
         // Check if the vaild body exist
         else{
-        day = req.body.day
-        if (req.body.work_start_hours && req.body.work_end_hours){
+            day = req.body.day
+            if (req.body.work_start_hours && req.body.work_end_hours){
 
-            for (i in day){
-                
-                if (day[i] === "monday"){
-                    user.schedules.monday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.monday.work_end_hours = req.body.work_end_hours
+                for (i in day){
+                    
+                    if (day[i] === "monday"){
+                        user.schedules.monday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.monday.work_end_hours = req.body.work_end_hours
 
-                }
-                if (day[i] === "tuesday"){
-                    user.schedules.tuesday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.tuesday.work_end_hours = req.body.work_end_hours
+                    }
+                    if (day[i] === "tuesday"){
+                        user.schedules.tuesday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.tuesday.work_end_hours = req.body.work_end_hours
 
-                }
-                if (day[i] === "wednesday"){
-                    user.schedules.wednesday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.wednesday.work_end_hours = req.body.work_end_hours
+                    }
+                    if (day[i] === "wednesday"){
+                        user.schedules.wednesday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.wednesday.work_end_hours = req.body.work_end_hours
 
-                }
-                if (day[i] === "thursday"){
-                    user.schedules.thursday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.thursday.work_end_hours = req.body.work_end_hours
+                    }
+                    if (day[i] === "thursday"){
+                        user.schedules.thursday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.thursday.work_end_hours = req.body.work_end_hours
 
-                }
-                
-                if (day[i] === "friday"){
-                    user.schedules.friday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.friday.work_end_hours = req.body.work_end_hours
+                    }
+                    
+                    if (day[i] === "friday"){
+                        user.schedules.friday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.friday.work_end_hours = req.body.work_end_hours
 
-                }
-                if (day[i] === "saturday"){
-                    user.schedules.saturday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.saturday.work_end_hours = req.body.work_end_hours
+                    }
+                    if (day[i] === "saturday"){
+                        user.schedules.saturday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.saturday.work_end_hours = req.body.work_end_hours
 
-                }
-                if (day[i] === "sunday"){
-                    user.schedules.sunday.work_start_hours = req.body.work_start_hours,
-                    user.schedules.sunday.work_end_hours = req.body.work_end_hours
+                    }
+                    if (day[i] === "sunday"){
+                        user.schedules.sunday.work_start_hours = req.body.work_start_hours,
+                        user.schedules.sunday.work_end_hours = req.body.work_end_hours
 
-                }
+                    }
 
             }
 
