@@ -25,14 +25,14 @@ exports.index = function (req, res) {
 //For creating new user
 exports.add = function (req, res) {
     if (!validator.isEmail(req.body.email)){
-        res.status(400).json({
-            status: 400,
+        res.status(300).json({
+            status: 300,
             message: "Error, Enter a valid email address"
         })
     }
     else if(!validator.isMobilePhone(req.body.phone)){
-        res.status(400).json({
-            status: 400,
+        res.status(300).json({
+            status: 300,
             message: "Error, Enter a Valid Phone Number"
         })
     }
@@ -630,14 +630,14 @@ exports.view = function (req, res) {
 // Update User
 exports.update = function (req, res) {
     if (!validator.isEmail(req.body.email)){
-        res.status(400).json({
-            status: 400,
+        res.status(300).json({
+            status: 300,
             message: "Error, Enter a valid email address"
         })
     }
     else if(!validator.isMobilePhone(req.body.phone)){
-        res.status(400).json({
-            status: 400,
+        res.status(300).json({
+            status: 300,
             message: "Error, Enter a Valid Phone Number"
         })
     }
@@ -657,8 +657,12 @@ exports.update = function (req, res) {
             
     //save and check errors
             user.save(function (err) {
-                if (err)
-                    res.json(err)
+                if (err){
+                    res.status(500).json({
+                        status: 500,
+                        message: "Error Updating the DB",
+                        data: err
+                })}
                 res.json({
                     status: 200,
                     message: "User Updated Successfully",
@@ -723,8 +727,12 @@ exports.deleteLimited = function (req, res) {
 
 //save and check errors
         user.save(function (err) {
-            if (err)
-                res.status(500).json(err)
+            if (err){
+                res.status(500).json({
+                    status: 500,
+                    message: "Error Updating the DB",
+                    data: err
+            })}
             res.status(200).json({
                 status: 200,
                 message: "Limited Hours List Updated Successfully",
