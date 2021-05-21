@@ -48,7 +48,7 @@ exports.add = function (req, res) {
     user.save()
     
     .then(user => res.status(200).json({
-        status: 200,
+        status: 201,
         message: "New User Added!",
         data: user
     }))
@@ -167,8 +167,8 @@ exports.addWork = function (req, res){
     }
         // Save the updated objects
         user.save()
-            .then(user => res.status(200).json({
-                status: 200,
+            .then(user => res.status(201).json({
+                status: 201,
                 message: "Work Hours Updated",
                 data: user
             }))
@@ -231,8 +231,8 @@ exports.addLimited = function (req, res) {
         }
     }
         user.save()
-            .then(user => res.status(200).json({
-                status: 200,
+            .then(user => res.status(201).json({
+                status: 201,
                 message: "Limited Hours for Blocked Apps Updated",
                 data: user
             }))
@@ -318,8 +318,8 @@ exports.addApp = function(req, res) {
         
         }
         user.save()
-        .then(user => res.status(200).json({
-            status: 200,
+        .then(user => res.status(201).json({
+            status: 201,
             message: "Blocked Apps Added",
             data: user
         }))
@@ -478,8 +478,8 @@ exports.removeApp = function(req, res) {
             }
         }
         user.save()
-        .then(user => res.status(200).json({
-            status: 200,
+        .then(user => res.status(201).json({
+            status: 201,
             message: "Blocked Apps List Updated",
             data: user
         }))
@@ -591,8 +591,8 @@ exports.limitedAppTime = function(req, res) {
             }
         }}
         user.save()
-        .then(user => res.status(200).json({
-            status: 200,
+        .then(user => res.status(201).json({
+            status: 201,
             message: "Successfully Updated the Limited Apps Time",
             data:user
         }))
@@ -612,8 +612,8 @@ exports.limitedAppTime = function(req, res) {
 // View User
 exports.view = function (req, res) {
     User.findById(req.params.user_id, function (err, user){})
-    .then(user => res.status(200).json({
-        status: 200,
+    .then(user => res.status(201).json({
+        status: 201,
         message: "User Details",
         data: user
     }))
@@ -630,14 +630,14 @@ exports.view = function (req, res) {
 // Update User
 exports.update = function (req, res) {
     if (!validator.isEmail(req.body.email)){
-        res.status(300).json({
-            status: 300,
+        res.status(401).json({
+            status: 401,
             message: "Error, Enter a valid email address"
         })
     }
     else if(!validator.isMobilePhone(req.body.phone)){
-        res.status(300).json({
-            status: 300,
+        res.status(401).json({
+            status: 401,
             message: "Error, Enter a Valid Phone Number"
         })
     }
@@ -664,7 +664,7 @@ exports.update = function (req, res) {
                         data: err
                 })}
                 res.json({
-                    status: 200,
+                    status: 201,
                     message: "User Updated Successfully",
                     data: user
                 });
@@ -685,7 +685,7 @@ exports.delete = function (req, res) {
                 data: err
         })}
         res.json({
-            status: 200,
+            status: 201,
             message: 'User Deleted'
         })
     })
@@ -733,8 +733,8 @@ exports.deleteLimited = function (req, res) {
                     message: "Error Updating the DB",
                     data: err
             })}
-            res.status(200).json({
-                status: 200,
+            res.status(201).json({
+                status: 201,
                 message: "Limited Hours List Updated Successfully",
                 data: user
             });
